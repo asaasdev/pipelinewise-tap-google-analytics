@@ -231,7 +231,8 @@ class GAClient:
     def generate_report_definition(self, stream):
         report_definition = {
             'metrics': [],
-            'dimensions': []
+            'dimensions': [],
+            'dimensionFilterClauses': stream.get('dimensionFilterClauses', []),
         }
 
         for dimension in stream['dimensions']:
@@ -262,6 +263,7 @@ class GAClient:
                         'pageToken': pageToken,
                         'metrics': report_definition['metrics'],
                         'dimensions': report_definition['dimensions'],
+                        'dimensionFilterClauses': report_definition['dimensionFilterClauses'],
                     }]
             },
             quotaUser=self.quota_user

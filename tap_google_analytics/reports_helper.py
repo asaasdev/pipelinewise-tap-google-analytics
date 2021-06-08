@@ -132,6 +132,11 @@ class ReportsHelper:
                 table_key_properties.append('report_start_date')
                 table_key_properties.append('report_end_date')
 
+            if report.get("dimensionFilterClauses"):
+                stream_metadata["metadata"]["dimension-filter-clauses"] = report.get(
+                    "dimensionFilterClauses"
+                )
+
             stream_metadata['metadata']['table-key-properties'] = table_key_properties
 
             # Add the Stream metadata (empty breadcrumb) to the start of the
@@ -206,9 +211,9 @@ class ReportsHelper:
     @staticmethod
     def get_report_definition(stream):
         report = {
-            "name" : stream['tap_stream_id'],
-            "dimensions" : [],
-            "metrics" : []
+            "name": stream['tap_stream_id'],
+            "dimensions": [],
+            "metrics": []
         }
 
         stream_metadata = singer.metadata.to_map(stream['metadata'])
@@ -220,5 +225,9 @@ class ReportsHelper:
                 report['dimensions'].append(attribute)
             elif ga_type == 'metric':
                 report['metrics'].append(attribute)
+
+        dimension_filters = singer.metadata.get(stream_metadata, (), 'dimension-filter-clauses')
+        if dimension_filters:
+            report['dimensionFilterClauses'] = dimension_filters
 
         return report
