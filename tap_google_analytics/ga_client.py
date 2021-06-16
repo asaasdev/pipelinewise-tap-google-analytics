@@ -185,10 +185,11 @@ class GAClient:
         try:
             records = []
             bookmark = singer.get_bookmark(self.state, stream.get("name"), "report_start_date")
-            if bookmark:
-                start_date = datetime.strptime(bookmark, "%Y-%m-%d") + timedelta(days=1)
-            else:
-                start_date = datetime.strptime(self.start_date, "%Y-%m-%d")
+
+            if not bookmark:
+                bookmark = self.start_date
+
+            start_date = datetime.strptime(bookmark, "%Y-%m-%d")
             end_date = datetime.strptime(self.end_date, "%Y-%m-%d")
 
             while start_date.date() <= end_date.date():

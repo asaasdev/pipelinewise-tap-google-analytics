@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import datetime
 import json
+import regex
 import sys
 
 from pathlib import Path
@@ -124,6 +125,38 @@ def load_json(path):
         return json.load(f)
 
 
+class DateParseError(Exception):
+    """DateParseError."""
+
+
+def convert_textual_date(date_str: str) -> datetime.datetime:
+    today = utils.now()
+    timedelta = 0
+
+    date_match = regex.fullmatch(r'(\d+)daysAgo|(yesterday)', date_str)
+
+    if not date_match:
+        raise DateParseError()
+
+    if date_match.group(1):
+        # daysAgo match
+        timedelta = int(date_match.group(1))
+    else:
+        # yesterday match
+        timedelta = 1
+
+    return today - datetime.timedelta(days=timedelta)
+
+
+def process_date(date_str: str):
+    try:
+        parsed_date = utils.strptime_to_utc(date_str)
+    except Exception:
+        parsed_date = convert_textual_date(date_str)
+
+    return parsed_date
+
+
 def process_args():
     # Parse command line arguments
     args = utils.parse_args(REQUIRED_CONFIG_KEYS)
@@ -149,13 +182,13 @@ def process_args():
     if 'end_date' in args.config and not args.config.get('end_date'):
         del args.config['end_date']
 
-    # Process the [start_date, end_date) so that they define an open date window
-    # that ends yesterday if end_date is not defined
-    start_date = utils.strptime_to_utc(args.config['start_date'])
+    # Process the [start_date, end_date] so that they define a closed date window
+    # that ends today if end_date is not defined
+    start_date = process_date(args.config['start_date'])
     args.config['start_date'] = utils.strftime(start_date, '%Y-%m-%d')
 
     end_date = args.config.get('end_date', utils.strftime(utils.now()))
-    end_date = utils.strptime_to_utc(end_date) - datetime.timedelta(days=1)
+    end_date = process_date(end_date)
     args.config['end_date'] = utils.strftime(end_date, '%Y-%m-%d')
 
     if end_date < start_date:
