@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import datetime
 import json
-import regex
+import re
 import sys
 
 from pathlib import Path
@@ -133,7 +133,7 @@ def convert_textual_date(date_str: str) -> datetime.datetime:
     today = utils.now()
     timedelta = 0
 
-    date_match = regex.fullmatch(r'(\d+)daysAgo|(yesterday)', date_str)
+    date_match = re.fullmatch(r'(\d+)daysAgo|(yesterday)', date_str)
 
     if not date_match:
         raise DateParseError()
