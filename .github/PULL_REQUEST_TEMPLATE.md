@@ -30,3 +30,6 @@ _Put an `x` in the boxes that apply_
 - [ ] Branch name starts with `AP-NNN` (if applicable. AP-NNN = JIRA ID)
 - [ ] Commits follow "[How to write a good git commit message](http://chris.beams.io/posts/git-commit/)"
 - [ ] Relevant documentation is updated including usage instructions
+
+### Revisado Local pela IA
+- [ ] Sim
